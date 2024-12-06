@@ -25,7 +25,7 @@ import 'package:blackhole/Services/player_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 
 class DataSearch extends SearchDelegate {
   final List<SongModel> data;
@@ -73,12 +73,10 @@ class DataSearch extends SearchDelegate {
         : [
             ...{
               ...data.where(
-                (element) =>
-                    element.title.toLowerCase().contains(query.toLowerCase()),
+                (element) => element.title.toLowerCase().contains(query.toLowerCase()),
               ),
               ...data.where(
-                (element) =>
-                    element.artist!.toLowerCase().contains(query.toLowerCase()),
+                (element) => element.artist!.toLowerCase().contains(query.toLowerCase()),
               ),
             },
           ];
@@ -126,12 +124,10 @@ class DataSearch extends SearchDelegate {
         : [
             ...{
               ...data.where(
-                (element) =>
-                    element.title.toLowerCase().contains(query.toLowerCase()),
+                (element) => element.title.toLowerCase().contains(query.toLowerCase()),
               ),
               ...data.where(
-                (element) =>
-                    element.artist!.toLowerCase().contains(query.toLowerCase()),
+                (element) => element.artist!.toLowerCase().contains(query.toLowerCase()),
               ),
             },
           ];
@@ -177,16 +173,13 @@ class DataSearch extends SearchDelegate {
     final ThemeData theme = Theme.of(context);
     return theme.copyWith(
       primaryColor: Theme.of(context).colorScheme.secondary,
-      textSelectionTheme:
-          const TextSelectionThemeData(cursorColor: Colors.white),
+      textSelectionTheme: const TextSelectionThemeData(cursorColor: Colors.white),
       hintColor: Colors.white70,
       primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.white),
       textTheme: theme.textTheme.copyWith(
-        titleLarge:
-            const TextStyle(fontWeight: FontWeight.normal, color: Colors.white),
+        titleLarge: const TextStyle(fontWeight: FontWeight.normal, color: Colors.white),
       ),
-      inputDecorationTheme:
-          const InputDecorationTheme(focusedBorder: InputBorder.none),
+      inputDecorationTheme: const InputDecorationTheme(focusedBorder: InputBorder.none),
     );
   }
 }
@@ -242,16 +235,12 @@ class DownloadsSearch extends SearchDelegate {
         : [
             ...{
               ...data.where(
-                (element) => element['title']
-                    .toString()
-                    .toLowerCase()
-                    .contains(query.toLowerCase()),
+                (element) =>
+                    element['title'].toString().toLowerCase().contains(query.toLowerCase()),
               ),
               ...data.where(
-                (element) => element['artist']
-                    .toString()
-                    .toLowerCase()
-                    .contains(query.toLowerCase()),
+                (element) =>
+                    element['artist'].toString().toLowerCase().contains(query.toLowerCase()),
               ),
             },
           ];
@@ -312,16 +301,12 @@ class DownloadsSearch extends SearchDelegate {
         : [
             ...{
               ...data.where(
-                (element) => element['title']
-                    .toString()
-                    .toLowerCase()
-                    .contains(query.toLowerCase()),
+                (element) =>
+                    element['title'].toString().toLowerCase().contains(query.toLowerCase()),
               ),
               ...data.where(
-                (element) => element['artist']
-                    .toString()
-                    .toLowerCase()
-                    .contains(query.toLowerCase()),
+                (element) =>
+                    element['artist'].toString().toLowerCase().contains(query.toLowerCase()),
               ),
             },
           ];
@@ -364,16 +349,13 @@ class DownloadsSearch extends SearchDelegate {
     final ThemeData theme = Theme.of(context);
     return theme.copyWith(
       primaryColor: Theme.of(context).colorScheme.secondary,
-      textSelectionTheme:
-          const TextSelectionThemeData(cursorColor: Colors.white),
+      textSelectionTheme: const TextSelectionThemeData(cursorColor: Colors.white),
       hintColor: Colors.white70,
       primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.white),
       textTheme: theme.textTheme.copyWith(
-        titleLarge:
-            const TextStyle(fontWeight: FontWeight.normal, color: Colors.white),
+        titleLarge: const TextStyle(fontWeight: FontWeight.normal, color: Colors.white),
       ),
-      inputDecorationTheme:
-          const InputDecorationTheme(focusedBorder: InputBorder.none),
+      inputDecorationTheme: const InputDecorationTheme(focusedBorder: InputBorder.none),
       scaffoldBackgroundColor: Colors.transparent,
     );
   }

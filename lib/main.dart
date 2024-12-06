@@ -93,8 +93,7 @@ Future<void> startService() async {
   await initializeLogging();
   MetadataGod.initialize();
   final audioHandlerHelper = AudioHandlerHelper();
-  final AudioPlayerHandler audioHandler =
-      await audioHandlerHelper.getAudioHandler();
+  final AudioPlayerHandler audioHandler = await audioHandlerHelper.getAudioHandler();
   GetIt.I.registerSingleton<AudioPlayerHandler>(audioHandler);
   GetIt.I.registerSingleton<MyTheme>(MyTheme());
 }
@@ -153,8 +152,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 
   // ignore: unreachable_from_main
-  static _MyAppState of(BuildContext context) =>
-      context.findAncestorStateOfType<_MyAppState>()!;
+  static _MyAppState of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>()!;
 }
 
 class _MyAppState extends State<MyApp> {
@@ -177,8 +175,7 @@ class _MyAppState extends State<MyApp> {
     // HomeWidget.registerBackgroundCallback(backgroundCallback);
     final String systemLangCode = Platform.localeName.substring(0, 2);
     final String? lang = Hive.box('settings').get('lang') as String?;
-    if (lang == null &&
-        LanguageCodes.languageCodes.values.contains(systemLangCode)) {
+    if (lang == null && LanguageCodes.languageCodes.values.contains(systemLangCode)) {
       _locale = Locale(systemLangCode);
     } else {
       _locale = Locale(LanguageCodes.languageCodes[lang ?? 'English'] ?? 'en');
@@ -190,11 +187,16 @@ class _MyAppState extends State<MyApp> {
 
     if (Platform.isAndroid || Platform.isIOS) {
       // For sharing or opening urls/text coming from outside the app while the app is in the memory
-      _intentTextStreamSubscription =
-          ReceiveSharingIntent.getTextStream().listen(
-        (String value) {
+      _intentTextStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+        (value) {
           Logger.root.info('Received intent on stream: $value');
-          handleSharedText(value, navigatorKey);
+          if (value.isNotEmpty) {
+            for (final file in value) {
+              if (file.type == SharedMediaType.text) {
+                handleSharedText(file.path ?? "", navigatorKey);
+              }
+            }
+          }
         },
         onError: (err) {
           Logger.root.severe('ERROR in getTextStream', err);
@@ -202,10 +204,15 @@ class _MyAppState extends State<MyApp> {
       );
 
       // For sharing or opening urls/text coming from outside the app while the app is closed
-      ReceiveSharingIntent.getInitialText().then(
-        (String? value) {
+      ReceiveSharingIntent.instance.getInitialMedia().then(
+        (value) {
           Logger.root.info('Received Intent initially: $value');
-          if (value != null) handleSharedText(value, navigatorKey);
+          if (value.isNotEmpty) {
+            for (final text in value) {
+              if (text != null && text.type == SharedMediaType.text)
+                handleSharedText(text.path, navigatorKey);
+            }
+          }
         },
         onError: (err) {
           Logger.root.severe('ERROR in getInitialTextStream', err);
@@ -213,16 +220,14 @@ class _MyAppState extends State<MyApp> {
       );
 
       // For sharing files coming from outside the app while the app is in the memory
-      _intentDataStreamSubscription =
-          ReceiveSharingIntent.getMediaStream().listen(
+      _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
         (List<SharedMediaFile> value) {
           if (value.isNotEmpty) {
             for (final file in value) {
               if (file.path.endsWith('.json')) {
-                final List playlistNames = Hive.box('settings')
-                        .get('playlistNames')
-                        ?.toList() as List? ??
-                    ['Favorite Songs'];
+                final List playlistNames =
+                    Hive.box('settings').get('playlistNames')?.toList() as List? ??
+                        ['Favorite Songs'];
                 importFilePlaylist(
                   null,
                   playlistNames,
@@ -241,15 +246,13 @@ class _MyAppState extends State<MyApp> {
       );
 
       // For sharing files coming from outside the app while the app is closed
-      ReceiveSharingIntent.getInitialMedia()
-          .then((List<SharedMediaFile> value) {
+      ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
         if (value.isNotEmpty) {
           for (final file in value) {
             if (file.path.endsWith('.json')) {
-              final List playlistNames = Hive.box('settings')
-                      .get('playlistNames')
-                      ?.toList() as List? ??
-                  ['Favorite Songs'];
+              final List playlistNames =
+                  Hive.box('settings').get('playlistNames')?.toList() as List? ??
+                      ['Favorite Songs'];
               importFilePlaylist(
                 null,
                 playlistNames,
@@ -291,53 +294,53 @@ class _MyAppState extends State<MyApp> {
             : AppTheme.themeMode == ThemeMode.dark
                 ? Brightness.light
                 : Brightness.dark,
-        systemNavigationBarIconBrightness:
-            AppTheme.themeMode == ThemeMode.system
-                ? MediaQuery.platformBrightnessOf(context) == Brightness.dark
-                    ? Brightness.light
-                    : Brightness.dark
-                : AppTheme.themeMode == ThemeMode.dark
-                    ? Brightness.light
-                    : Brightness.dark,
+        systemNavigationBarIconBrightness: AppTheme.themeMode == ThemeMode.system
+            ? MediaQuery.platformBrightnessOf(context) == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark
+            : AppTheme.themeMode == ThemeMode.dark
+                ? Brightness.light
+                : Brightness.dark,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return OrientationBuilder(
             builder: (context, orientation) {
-              SizerUtil.setScreenSize(constraints, orientation);
-              return MaterialApp(
-                title: 'BlackHole',
-                restorationScopeId: 'blackhole',
-                debugShowCheckedModeBanner: false,
-                themeMode: AppTheme.themeMode,
-                theme: AppTheme.lightTheme(
-                  context: context,
-                ),
-                darkTheme: AppTheme.darkTheme(
-                  context: context,
-                ),
-                locale: _locale,
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: LanguageCodes.languageCodes.entries
-                    .map((languageCode) => Locale(languageCode.value, ''))
-                    .toList(),
-                routes: namedRoutes,
-                navigatorKey: navigatorKey,
-                onGenerateRoute: (RouteSettings settings) {
-                  if (settings.name == '/player') {
-                    return PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder: (_, __, ___) => const PlayScreen(),
-                    );
-                  }
-                  return HandleRoute.handleRoute(settings.name);
-                },
-              );
+              return Sizer(builder: (context, constraints, deviceType) {
+                return MaterialApp(
+                  title: 'BlackHole',
+                  restorationScopeId: 'blackhole',
+                  debugShowCheckedModeBanner: false,
+                  themeMode: AppTheme.themeMode,
+                  theme: AppTheme.lightTheme(
+                    context: context,
+                  ),
+                  darkTheme: AppTheme.darkTheme(
+                    context: context,
+                  ),
+                  locale: _locale,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: LanguageCodes.languageCodes.entries
+                      .map((languageCode) => Locale(languageCode.value, ''))
+                      .toList(),
+                  routes: namedRoutes,
+                  navigatorKey: navigatorKey,
+                  onGenerateRoute: (RouteSettings settings) {
+                    if (settings.name == '/player') {
+                      return PageRouteBuilder(
+                        opaque: false,
+                        pageBuilder: (_, __, ___) => const PlayScreen(),
+                      );
+                    }
+                    return HandleRoute.handleRoute(settings.name);
+                  },
+                );
+              });
             },
           );
         },

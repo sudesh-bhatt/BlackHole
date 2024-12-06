@@ -46,7 +46,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -57,16 +57,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
   String? appVersion;
-  String name =
-      Hive.box('settings').get('name', defaultValue: 'Guest') as String;
-  bool checkUpdate =
-      Hive.box('settings').get('checkUpdate', defaultValue: true) as bool;
-  bool autoBackup =
-      Hive.box('settings').get('autoBackup', defaultValue: false) as bool;
-  List sectionsToShow = Hive.box('settings').get(
+  String name = Hive.box('settings').get('name', defaultValue: 'Guest') as String;
+  bool checkUpdate = Hive.box('settings').get('checkUpdate', defaultValue: true) as bool;
+  bool autoBackup = Hive.box('settings').get('autoBackup', defaultValue: false) as bool;
+  List<String> sectionsToShow = Hive.box('settings').get(
     'sectionsToShow',
     defaultValue: ['Home', 'Top Charts', 'YouTube', 'Library'],
-  ) as List;
+  ) as List<String>;
   DateTime? backButtonPressTime;
   final bool useDense = Hive.box('settings').get(
     'useDenseMini',
@@ -74,19 +71,18 @@ class _HomePageState extends State<HomePage> {
   ) as bool;
 
   void callback() {
-    sectionsToShow = Hive.box('settings').get(
-      'sectionsToShow',
-      defaultValue: ['Home', 'Top Charts', 'YouTube', 'Library'],
-    ) as List;
-    onItemTapped(0);
-    setState(() {});
+    setState(() {
+      sectionsToShow = Hive.box('settings').get(
+        'sectionsToShow',
+        defaultValue: ['Home', 'Top Charts', 'YouTube', 'Library'],
+      ) as List<String>;
+      onItemTapped(0);
+    });
   }
 
   void onItemTapped(int index) {
     _selectedIndex.value = index;
-    _controller.jumpToTab(
-      index,
-    );
+    _controller.jumpToTab(index);
   }
 
   // Future<bool> handleWillPop(BuildContext? context) async {
@@ -131,13 +127,11 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   String arch = '';
                   if (Platform.isAndroid) {
-                    List? abis = await Hive.box('settings').get('supportedAbis')
-                        as List?;
+                    List? abis = Hive.box('settings').get('supportedAbis') as List?;
 
                     if (abis == null) {
                       final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-                      final AndroidDeviceInfo androidDeviceInfo =
-                          await deviceInfo.androidInfo;
+                      final AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
                       abis = androidDeviceInfo.supportedAbis;
                       await Hive.box('settings').put('supportedAbis', abis);
                     }
@@ -164,23 +158,14 @@ class _HomePageState extends State<HomePage> {
       }
       if (autoBackup) {
         final List<String> checked = [
-          AppLocalizations.of(
-            context,
-          )!
-              .settings,
-          AppLocalizations.of(
-            context,
-          )!
-              .downs,
-          AppLocalizations.of(
-            context,
-          )!
-              .playlists,
+          AppLocalizations.of(context)!.settings,
+          AppLocalizations.of(context)!.downs,
+          AppLocalizations.of(context)!.playlists,
         ];
-        final List playlistNames = Hive.box('settings').get(
+        final List<String> playlistNames = Hive.box('settings').get(
           'playlistNames',
           defaultValue: ['Favorite Songs'],
-        ) as List;
+        ) as List<String>;
         final Map<String, List> boxNames = {
           AppLocalizations.of(
             context,
@@ -203,7 +188,7 @@ class _HomePageState extends State<HomePage> {
           'autoBackPath',
           defaultValue: '',
         ) as String;
-        if (autoBackPath == '') {
+        if (autoBackPath.isEmpty) {
           ExtStorageProvider.getExtStorage(
             dirName: 'BlackHole/Backups',
             writeAccess: true,
@@ -255,7 +240,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final PageController _pageController = PageController();
-  final PersistentTabController _controller = PersistentTabController();
+  final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
   @override
   void initState() {
@@ -274,7 +259,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool rotated = MediaQuery.sizeOf(context).height < screenWidth;
-    final miniplayer = MiniPlayer();
+    final MiniPlayer miniplayer = MiniPlayer();
     return GradientContainer(
       child: Scaffold(
         appBar: AppBar(
@@ -367,10 +352,8 @@ class _HomePageState extends State<HomePage> {
                                 leading: const Icon(
                                   Icons.home_rounded,
                                 ),
-                                selected: _selectedIndex.value ==
-                                    sectionsToShow.indexOf('Home'),
-                                selectedColor:
-                                    Theme.of(context).colorScheme.secondary,
+                                selected: _selectedIndex.value == sectionsToShow.indexOf('Home'),
+                                selectedColor: Theme.of(context).colorScheme.secondary,
                                 onTap: () {
                                   Navigator.pop(context);
                                   if (_selectedIndex.value != 0) {
@@ -379,8 +362,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                               ListTile(
-                                title:
-                                    Text(AppLocalizations.of(context)!.myMusic),
+                                title: Text(AppLocalizations.of(context)!.myMusic),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20.0,
                                 ),
@@ -393,21 +375,19 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          (Platform.isWindows ||
-                                                  Platform.isLinux ||
-                                                  Platform.isMacOS)
-                                              ? const DownloadedSongsDesktop()
-                                              : const DownloadedSongs(
-                                                  showPlaylists: true,
-                                                ),
+                                      builder: (context) => (Platform.isWindows ||
+                                              Platform.isLinux ||
+                                              Platform.isMacOS)
+                                          ? const DownloadedSongsDesktop()
+                                          : const DownloadedSongs(
+                                              showPlaylists: true,
+                                            ),
                                     ),
                                   );
                                 },
                               ),
                               ListTile(
-                                title:
-                                    Text(AppLocalizations.of(context)!.downs),
+                                title: Text(AppLocalizations.of(context)!.downs),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20.0,
                                 ),
@@ -445,14 +425,12 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 // miscellaneous_services_rounded,
                                 leading: const Icon(Icons.settings_rounded),
-                                selected: _selectedIndex.value ==
-                                    sectionsToShow.indexOf('Settings'),
-                                selectedColor:
-                                    Theme.of(context).colorScheme.secondary,
+                                selected:
+                                    _selectedIndex.value == sectionsToShow.indexOf('Settings'),
+                                selectedColor: Theme.of(context).colorScheme.secondary,
                                 onTap: () {
                                   Navigator.pop(context);
-                                  final idx =
-                                      sectionsToShow.indexOf('Settings');
+                                  final idx = sectionsToShow.indexOf('Settings');
                                   if (idx != -1) {
                                     if (_selectedIndex.value != idx) {
                                       onItemTapped(idx);
@@ -461,16 +439,14 @@ class _HomePageState extends State<HomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            NewSettingsPage(callback: callback),
+                                        builder: (context) => NewSettingsPage(callback: callback),
                                       ),
                                     );
                                   }
                                 },
                               ),
                               ListTile(
-                                title:
-                                    Text(AppLocalizations.of(context)!.about),
+                                title: Text(AppLocalizations.of(context)!.about),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20.0,
                                 ),
@@ -545,10 +521,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                     unselectedIconTheme: Theme.of(context).iconTheme,
                     useIndicator: screenWidth < 1050,
-                    indicatorColor: Theme.of(context)
-                        .colorScheme
-                        .secondary
-                        .withOpacity(0.2),
+                    indicatorColor: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                     leading: homeDrawer(
                       context: context,
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -569,7 +542,7 @@ class _HomePageState extends State<HomePage> {
                           );
                         case 'YouTube':
                           return NavigationRailDestination(
-                            icon: const Icon(MdiIcons.youtube),
+                            icon: Icon(MdiIcons.youtube),
                             label: Text(AppLocalizations.of(context)!.youTube),
                           );
                         case 'Library':
@@ -589,19 +562,16 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-            Expanded(
+            /* Expanded(
               child: PersistentTabView.custom(
                 context,
                 controller: _controller,
                 itemCount: sectionsToShow.length,
-                navBarHeight: 60 +
-                    (rotated ? 0 : 70) +
-                    (useDense ? 0 : 10) +
-                    (rotated && useDense ? 10 : 0),
+                navBarHeight:
+                    60 + (rotated ? 0 : 70) + (useDense ? 0 : 10) + (rotated && useDense ? 10 : 0),
                 // confineInSafeArea: false,
                 onItemTapped: onItemTapped,
-                routeAndNavigatorSettings:
-                    CustomWidgetRouteAndNavigatorSettings(
+                routeAndNavigatorSettings: CustomWidgetRouteAndNavigatorSettings(
                   routes: namedRoutes,
                   onGenerateRoute: (RouteSettings settings) {
                     if (settings.name == '/player') {
@@ -630,8 +600,7 @@ class _HomePageState extends State<HomePage> {
                             height: 60,
                             child: CustomBottomNavBar(
                               currentIndex: indexValue,
-                              backgroundColor: Theme.of(context).brightness ==
-                                      Brightness.dark
+                              backgroundColor: Theme.of(context).brightness == Brightness.dark
                                   ? Colors.black.withOpacity(0.9)
                                   : Colors.white.withOpacity(0.9),
                               onTap: (index) {
@@ -661,6 +630,28 @@ class _HomePageState extends State<HomePage> {
                   }
                 }).toList(),
               ),
+            ),*/
+            Expanded(
+              child: PersistentTabView(
+                tabs: _navBarItems(context),
+                controller: _controller,
+                navBarHeight:
+                    60 + (rotated ? 0 : 70) + (useDense ? 0 : 10) + (rotated && useDense ? 10 : 0),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black.withOpacity(0.9)
+                    : Colors.white.withOpacity(0.9),
+                handleAndroidBackButtonPress: true,
+                resizeToAvoidBottomInset: true,
+                stateManagement: true,
+                popAllScreensOnTapOfSelectedTab: true,
+                popActionScreens: PopActionScreensType.all,
+                navBarBuilder: (navBarConfig) => Style6BottomNavBar(
+                  navBarConfig: navBarConfig,
+                  navBarDecoration: NavBarDecoration(
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -668,7 +659,69 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<CustomBottomNavBarItem> _navBarItems(BuildContext context) {
+  List<PersistentTabConfig> _navBarItems(BuildContext context) {
+    return sectionsToShow.map((section) {
+      switch (section) {
+        case 'Home':
+          return PersistentTabConfig(
+            screen: const HomeScreen(),
+            item: ItemConfig(
+              icon: const Icon(Icons.home_rounded),
+              title: AppLocalizations.of(context)!.home,
+              activeForegroundColor: Theme.of(context).colorScheme.secondary,
+              inactiveBackgroundColor: Theme.of(context).iconTheme.color!,
+            ),
+          );
+
+        case 'Top Charts':
+          return PersistentTabConfig(
+            screen: TopCharts(
+              pageController: _pageController,
+            ),
+            item: ItemConfig(
+              icon: const Icon(Icons.trending_up_rounded),
+              title: AppLocalizations.of(context)!.topCharts,
+              activeForegroundColor: Theme.of(context).colorScheme.secondary,
+              inactiveBackgroundColor: Theme.of(context).iconTheme.color!,
+            ),
+          );
+
+        case 'YouTube':
+          return PersistentTabConfig(
+            screen: const YouTube(),
+            item: ItemConfig(
+              icon: Icon(MdiIcons.youtube),
+              title: AppLocalizations.of(context)!.youTube,
+              activeForegroundColor: Theme.of(context).colorScheme.secondary,
+              inactiveBackgroundColor: Theme.of(context).iconTheme.color!,
+            ),
+          );
+
+        case 'Library':
+          return PersistentTabConfig(
+            screen: const LibraryPage(),
+            item: ItemConfig(
+              icon: const Icon(Icons.my_library_music_rounded),
+              title: AppLocalizations.of(context)!.library,
+              activeForegroundColor: Theme.of(context).colorScheme.secondary,
+              inactiveBackgroundColor: Theme.of(context).iconTheme.color!,
+            ),
+          );
+
+        default:
+          return PersistentTabConfig(
+            screen: NewSettingsPage(callback: callback),
+            item: ItemConfig(
+              icon: const Icon(Icons.settings_rounded),
+              title: AppLocalizations.of(context)!.settings,
+              activeForegroundColor: Theme.of(context).colorScheme.secondary,
+              inactiveBackgroundColor: Theme.of(context).iconTheme.color!,
+            ),
+          );
+      }
+    }).toList();
+  }
+/*List<CustomBottomNavBarItem> _navBarItems(BuildContext context) {
     return sectionsToShow.map((section) {
       switch (section) {
         case 'Home':
@@ -703,5 +756,5 @@ class _HomePageState extends State<HomePage> {
           );
       }
     }).toList();
-  }
+  }*/
 }

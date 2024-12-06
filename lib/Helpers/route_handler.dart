@@ -29,7 +29,7 @@ import 'package:blackhole/Services/player_service.dart';
 import 'package:blackhole/Services/youtube_services.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class HandleRoute {
@@ -104,8 +104,7 @@ class HandleRoute {
         );
       }
     } else {
-      final RegExpMatch? fileResult =
-          RegExp(r'\/[0-9]+\/([0-9]+)\/').firstMatch('$url/');
+      final RegExpMatch? fileResult = RegExp(r'\/[0-9]+\/([0-9]+)\/').firstMatch('$url/');
       if (fileResult != null) {
         return PageRouteBuilder(
           opaque: false,
@@ -173,8 +172,7 @@ class SpotifyUrlHandler extends StatelessWidget {
               PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (_, __, ___) => SearchPage(
-                  query: (value['artists'] != null &&
-                          (value['artists'] as List).isNotEmpty)
+                  query: (value['artists'] != null && (value['artists'] as List).isNotEmpty)
                       ? '${value["name"]} by ${value["artists"][0]["name"]}'
                       : value['name'].toString(),
                 ),
@@ -196,9 +194,7 @@ class YtUrlHandler extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (type == 'v') {
-      YouTubeServices.instance
-          .formatVideoFromId(id: id)
-          .then((Map? response) async {
+      YouTubeServices.instance.formatVideoFromId(id: id).then((Map? response) async {
         if (response != null) {
           PlayerInvoke.init(
             songsList: [response],

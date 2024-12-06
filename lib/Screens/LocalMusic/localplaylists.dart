@@ -23,7 +23,7 @@ import 'package:blackhole/Helpers/audio_query.dart';
 import 'package:blackhole/Screens/LocalMusic/downed_songs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 
 class LocalPlaylists extends StatefulWidget {
   final List<PlaylistModel> playlistDetails;
@@ -201,8 +201,7 @@ class _LocalPlaylistsState extends State<LocalPlaylists> {
                     ],
                   ),
                   onTap: () async {
-                    final songs =
-                        await widget.offlineAudioQuery.getPlaylistSongs(
+                    final songs = await widget.offlineAudioQuery.getPlaylistSongs(
                       playlistDetails[index].id,
                     );
                     Navigator.push(

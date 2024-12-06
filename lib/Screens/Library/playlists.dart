@@ -38,10 +38,8 @@ class PlaylistScreen extends StatefulWidget {
 class _PlaylistScreenState extends State<PlaylistScreen> {
   final Box settingsBox = Hive.box('settings');
   final List playlistNames =
-      Hive.box('settings').get('playlistNames')?.toList() as List? ??
-          ['Favorite Songs'];
-  Map playlistDetails =
-      Hive.box('settings').get('playlistDetails', defaultValue: {}) as Map;
+      Hive.box('settings').get('playlistNames')?.toList() as List? ?? ['Favorite Songs'];
+  Map playlistDetails = Hive.box('settings').get('playlistDetails', defaultValue: {}) as Map;
   @override
   Widget build(BuildContext context) {
     if (!playlistNames.contains('Favorite Songs')) {
@@ -91,8 +89,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       if (value.trim() == '') {
                         value = 'Playlist ${playlistNames.length}';
                       }
-                      while (playlistNames.contains(value) ||
-                          await Hive.boxExists(value)) {
+                      while (playlistNames.contains(value) || await Hive.boxExists(value)) {
                         // ignore: use_string_buffers
                         value = '$value (1)';
                       }
@@ -163,23 +160,16 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 ),
                                 itemCount: playlistNames.length,
                                 itemBuilder: (context, index) {
-                                  final String name =
-                                      playlistNames[index].toString();
-                                  final String showName =
-                                      playlistDetails.containsKey(name)
-                                          ? playlistDetails[name]['name']
-                                                  ?.toString() ??
-                                              name
-                                          : name;
+                                  final String name = playlistNames[index].toString();
+                                  final String showName = playlistDetails.containsKey(name)
+                                      ? playlistDetails[name]['name']?.toString() ?? name
+                                      : name;
                                   return CheckboxListTile(
-                                    activeColor:
-                                        Theme.of(context).colorScheme.secondary,
-                                    checkColor: Theme.of(context)
-                                                .colorScheme
-                                                .secondary ==
-                                            Colors.white
-                                        ? Colors.black
-                                        : null,
+                                    activeColor: Theme.of(context).colorScheme.secondary,
+                                    checkColor:
+                                        Theme.of(context).colorScheme.secondary == Colors.white
+                                            ? Colors.black
+                                            : null,
                                     value: checked.contains(index),
                                     onChanged: (value) {
                                       if (value ?? false) {
@@ -194,26 +184,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     subtitle: playlistDetails[name] == null ||
-                                            playlistDetails[name]['count'] ==
-                                                null ||
+                                            playlistDetails[name]['count'] == null ||
                                             playlistDetails[name]['count'] == 0
                                         ? null
                                         : Text(
                                             '${playlistDetails[name]['count']} ${AppLocalizations.of(context)!.songs}',
                                           ),
                                     secondary: (playlistDetails[name] == null ||
-                                            playlistDetails[name]
-                                                    ['imagesList'] ==
-                                                null ||
-                                            (playlistDetails[name]['imagesList']
-                                                    as List)
-                                                .isEmpty)
+                                            playlistDetails[name]['imagesList'] == null ||
+                                            (playlistDetails[name]['imagesList'] as List).isEmpty)
                                         ? Card(
                                             elevation: 5,
                                             color: Colors.transparent,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
+                                              borderRadius: BorderRadius.circular(
                                                 7.0,
                                               ),
                                             ),
@@ -235,11 +219,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             ),
                                           )
                                         : Collage(
-                                            imageList: playlistDetails[name]
-                                                ['imagesList'] as List,
+                                            imageList: playlistDetails[name]['imagesList'] as List,
                                             showGrid: true,
-                                            placeholderImage:
-                                                'assets/cover.jpg',
+                                            placeholderImage: 'assets/cover.jpg',
                                           ),
                                   );
                                 },
@@ -248,11 +230,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                             actions: [
                               TextButton(
                                 style: TextButton.styleFrom(
-                                  foregroundColor:
-                                      Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.grey[700],
+                                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.grey[700],
                                 ),
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -267,24 +247,19 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               TextButton(
                                 style: TextButton.styleFrom(
                                   foregroundColor:
-                                      Theme.of(context).colorScheme.secondary ==
-                                              Colors.white
+                                      Theme.of(context).colorScheme.secondary == Colors.white
                                           ? Colors.black
                                           : null,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.secondary,
                                 ),
                                 onPressed: () async {
                                   try {
-                                    final List<String> playlistsToMerge =
-                                        checked
-                                            .map(
-                                              (int e) =>
-                                                  playlistNames[e].toString(),
-                                            )
-                                            .toList();
-                                    if (playlistsToMerge
-                                        .contains('Favorite Songs')) {
+                                    final List<String> playlistsToMerge = checked
+                                        .map(
+                                          (int e) => playlistNames[e].toString(),
+                                        )
+                                        .toList();
+                                    if (playlistsToMerge.contains('Favorite Songs')) {
                                       playlistsToMerge.remove('Favorite Songs');
                                       playlistsToMerge.insert(
                                         0,
@@ -296,15 +271,12 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                       for (final String playlistName
                                           in playlistsToMerge.sublist(1)) {
                                         try {
-                                          final Box playlistBox =
-                                              await Hive.openBox(
+                                          final Box playlistBox = await Hive.openBox(
                                             playlistName,
                                           );
-                                          final Map songsMap =
-                                              playlistBox.toMap();
+                                          final Map songsMap = playlistBox.toMap();
                                           finalMap.addAll(songsMap);
-                                          await playlistDetails
-                                              .remove(playlistName);
+                                          await playlistDetails.remove(playlistName);
                                           playlistNames.remove(playlistName);
                                           await playlistBox.deleteFromDisk();
                                         } catch (e) {
@@ -317,8 +289,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                           );
                                         }
                                       }
-                                      final Box finalPlaylistBox =
-                                          await Hive.openBox(
+                                      final Box finalPlaylistBox = await Hive.openBox(
                                         playlistsToMerge.first,
                                       );
                                       finalPlaylistBox.putAll(finalMap);
@@ -386,8 +357,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       return ListTile(
                         leading: (playlistDetails[name] == null ||
                                 playlistDetails[name]['imagesList'] == null ||
-                                (playlistDetails[name]['imagesList'] as List)
-                                    .isEmpty)
+                                (playlistDetails[name]['imagesList'] as List).isEmpty)
                             ? Card(
                                 elevation: 5,
                                 color: Colors.transparent,
@@ -412,8 +382,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 ),
                               )
                             : Collage(
-                                imageList:
-                                    playlistDetails[name]['imagesList'] as List,
+                                imageList: playlistDetails[name]['imagesList'] as List,
                                 showGrid: true,
                                 placeholderImage: 'assets/cover.jpg',
                               ),
@@ -441,9 +410,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 context,
                                 name,
                                 playlistDetails.containsKey(name)
-                                    ? playlistDetails[name]['name']
-                                            ?.toString() ??
-                                        name
+                                    ? playlistDetails[name]['name']?.toString() ?? name
                                     : name,
                               );
                             }
@@ -452,9 +419,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 context,
                                 name,
                                 playlistDetails.containsKey(name)
-                                    ? playlistDetails[name]['name']
-                                            ?.toString() ??
-                                        name
+                                    ? playlistDetails[name]['name']?.toString() ?? name
                                     : name,
                               );
                             }
@@ -498,17 +463,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                               )!
                                                   .rename,
                                               style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
+                                                color: Theme.of(context).colorScheme.secondary,
                                               ),
                                             ),
                                           ],
                                         ),
                                         TextField(
                                           autofocus: true,
-                                          textAlignVertical:
-                                              TextAlignVertical.bottom,
+                                          textAlignVertical: TextAlignVertical.bottom,
                                           controller: controller,
                                           onSubmitted: (value) async {
                                             Navigator.pop(context);
@@ -533,8 +495,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     actions: [
                                       TextButton(
                                         style: TextButton.styleFrom(
-                                          foregroundColor:
-                                              Theme.of(context).iconTheme.color,
+                                          foregroundColor: Theme.of(context).iconTheme.color,
                                         ),
                                         onPressed: () {
                                           Navigator.pop(context);
@@ -549,22 +510,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                       TextButton(
                                         style: TextButton.styleFrom(
                                           foregroundColor: Colors.white,
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
+                                          backgroundColor: Theme.of(context).colorScheme.secondary,
                                         ),
                                         onPressed: () async {
                                           Navigator.pop(context);
                                           playlistDetails[name] == null
                                               ? playlistDetails.addAll({
                                                   name: {
-                                                    'name':
-                                                        controller.text.trim(),
+                                                    'name': controller.text.trim(),
                                                   },
                                                 })
                                               : playlistDetails[name].addAll({
-                                                  'name':
-                                                      controller.text.trim(),
+                                                  'name': controller.text.trim(),
                                                 });
 
                                           await settingsBox.put(
@@ -578,9 +535,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                           )!
                                               .ok,
                                           style: TextStyle(
-                                            color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary ==
+                                            color: Theme.of(context).colorScheme.secondary ==
                                                     Colors.white
                                                 ? Colors.black
                                                 : null,
@@ -627,7 +582,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               value: 1,
                               child: Row(
                                 children: [
-                                  const Icon(MdiIcons.export),
+                                  Icon(MdiIcons.export),
                                   const SizedBox(width: 10.0),
                                   Text(
                                     AppLocalizations.of(context)!.export,
@@ -639,7 +594,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               value: 2,
                               child: Row(
                                 children: [
-                                  const Icon(MdiIcons.share),
+                                  Icon(MdiIcons.share),
                                   const SizedBox(width: 10.0),
                                   Text(
                                     AppLocalizations.of(context)!.share,
@@ -657,9 +612,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               builder: (context) => LikedSongs(
                                 playlistName: name,
                                 showName: playlistDetails.containsKey(name)
-                                    ? playlistDetails[name]['name']
-                                            ?.toString() ??
-                                        name
+                                    ? playlistDetails[name]['name']?.toString() ?? name
                                     : name,
                               ),
                             ),

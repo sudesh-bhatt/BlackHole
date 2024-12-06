@@ -27,14 +27,13 @@ import 'package:blackhole/Helpers/playlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 
 class AddToOffPlaylist {
   OfflineAudioQuery offlineAudioQuery = OfflineAudioQuery();
 
   Future<void> addToOffPlaylist(BuildContext context, int audioId) async {
-    List<PlaylistModel> playlistDetails =
-        await offlineAudioQuery.getPlaylists();
+    List<PlaylistModel> playlistDetails = await offlineAudioQuery.getPlaylists();
     showModalBottomSheet(
       isDismissible: true,
       backgroundColor: Colors.transparent,
@@ -69,8 +68,7 @@ class AddToOffPlaylist {
                       title: AppLocalizations.of(context)!.createNewPlaylist,
                       onSubmitted: (String value, BuildContext context) async {
                         await offlineAudioQuery.createPlaylist(name: value);
-                        playlistDetails =
-                            await offlineAudioQuery.getPlaylists();
+                        playlistDetails = await offlineAudioQuery.getPlaylists();
                         Navigator.pop(context);
                       },
                     );
@@ -139,10 +137,9 @@ class AddToOffPlaylist {
 
 class AddToPlaylist {
   Box settingsBox = Hive.box('settings');
-  List playlistNames = Hive.box('settings')
-      .get('playlistNames', defaultValue: ['Favorite Songs']) as List;
-  Map playlistDetails =
-      Hive.box('settings').get('playlistDetails', defaultValue: {}) as Map;
+  List playlistNames =
+      Hive.box('settings').get('playlistNames', defaultValue: ['Favorite Songs']) as List;
+  Map playlistDetails = Hive.box('settings').get('playlistDetails', defaultValue: {}) as Map;
 
   void addToPlaylist(BuildContext context, MediaItem? mediaItem) {
     showModalBottomSheet(
@@ -183,8 +180,7 @@ class AddToPlaylist {
                         if (value.trim() == '') {
                           value = 'Playlist ${playlistNames.length}';
                         }
-                        if (playlistNames.contains(value) ||
-                            await Hive.boxExists(value)) {
+                        if (playlistNames.contains(value) || await Hive.boxExists(value)) {
                           value = '$value (1)';
                         }
                         playlistNames.add(value);
@@ -203,11 +199,8 @@ class AddToPlaylist {
                     itemCount: playlistNames.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        leading: playlistDetails[playlistNames[index]] ==
-                                    null ||
-                                playlistDetails[playlistNames[index]]
-                                        ['imagesList'] ==
-                                    null
+                        leading: playlistDetails[playlistNames[index]] == null ||
+                                playlistDetails[playlistNames[index]]['imagesList'] == null
                             ? Card(
                                 elevation: 5,
                                 shape: RoundedRectangleBorder(
@@ -224,8 +217,8 @@ class AddToPlaylist {
                                 ),
                               )
                             : Collage(
-                                imageList: playlistDetails[playlistNames[index]]
-                                    ['imagesList'] as List,
+                                imageList:
+                                    playlistDetails[playlistNames[index]]['imagesList'] as List,
                                 showGrid: true,
                                 placeholderImage: 'assets/cover.jpg',
                               ),

@@ -110,25 +110,20 @@ class _AboutPageState extends State<AboutPage> {
                                   AppLocalizations.of(context)!.updateAvailable,
                                   duration: const Duration(seconds: 15),
                                   action: SnackBarAction(
-                                    textColor:
-                                        Theme.of(context).colorScheme.secondary,
+                                    textColor: Theme.of(context).colorScheme.secondary,
                                     label: AppLocalizations.of(context)!.update,
                                     onPressed: () async {
                                       String arch = '';
                                       if (Platform.isAndroid) {
-                                        List? abis = await Hive.box('settings')
-                                            .get('supportedAbis') as List?;
+                                        List? abis = await Hive.box('settings').get('supportedAbis')
+                                            as List?;
 
                                         if (abis == null) {
-                                          final DeviceInfoPlugin deviceInfo =
-                                              DeviceInfoPlugin();
-                                          final AndroidDeviceInfo
-                                              androidDeviceInfo =
+                                          final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                          final AndroidDeviceInfo androidDeviceInfo =
                                               await deviceInfo.androidInfo;
-                                          abis =
-                                              androidDeviceInfo.supportedAbis;
-                                          await Hive.box('settings')
-                                              .put('supportedAbis', abis);
+                                          abis = androidDeviceInfo.supportedAbis;
+                                          await Hive.box('settings').put('supportedAbis', abis);
                                         }
                                         if (abis.contains('arm64')) {
                                           arch = 'arm64';
@@ -244,10 +239,9 @@ class _AboutPageState extends State<AboutPage> {
                         },
                         trailing: TextButton(
                           style: TextButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.grey[700],
+                            foregroundColor: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.grey[700],
                           ),
                           onPressed: () {
                             copyToClipboard(
@@ -292,14 +286,13 @@ class _AboutPageState extends State<AboutPage> {
                                 height: 100,
                                 child: GradientContainer(
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: const Icon(
+                                            icon: Icon(
                                               MdiIcons.gmail,
                                             ),
                                             iconSize: 40,
@@ -313,8 +306,7 @@ class _AboutPageState extends State<AboutPage> {
                                                 Uri.parse(
                                                   'https://mail.google.com/mail/?extsrc=mailto&url=mailto%3A%3Fto%3Dblackholeyoucantescape%40gmail.com%26subject%3DRegarding%2520Mobile%2520App',
                                                 ),
-                                                mode: LaunchMode
-                                                    .externalApplication,
+                                                mode: LaunchMode.externalApplication,
                                               );
                                             },
                                           ),
@@ -331,7 +323,7 @@ class _AboutPageState extends State<AboutPage> {
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              Icons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
@@ -344,8 +336,7 @@ class _AboutPageState extends State<AboutPage> {
                                                 Uri.parse(
                                                   'https://t.me/joinchat/fHDC1AWnOhw0ZmI9',
                                                 ),
-                                                mode: LaunchMode
-                                                    .externalApplication,
+                                                mode: LaunchMode.externalApplication,
                                               );
                                             },
                                           ),
@@ -361,7 +352,7 @@ class _AboutPageState extends State<AboutPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: const Icon(
+                                            icon: Icon(
                                               MdiIcons.instagram,
                                             ),
                                             iconSize: 40,
@@ -375,8 +366,7 @@ class _AboutPageState extends State<AboutPage> {
                                                 Uri.parse(
                                                   'https://instagram.com/sangwan5688',
                                                 ),
-                                                mode: LaunchMode
-                                                    .externalApplication,
+                                                mode: LaunchMode.externalApplication,
                                               );
                                             },
                                           ),
@@ -417,15 +407,14 @@ class _AboutPageState extends State<AboutPage> {
                                 height: 100,
                                 child: GradientContainer(
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              Icons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
@@ -438,8 +427,7 @@ class _AboutPageState extends State<AboutPage> {
                                                 Uri.parse(
                                                   'https://t.me/joinchat/fHDC1AWnOhw0ZmI9',
                                                 ),
-                                                mode: LaunchMode
-                                                    .externalApplication,
+                                                mode: LaunchMode.externalApplication,
                                               );
                                             },
                                           ),
@@ -456,7 +444,7 @@ class _AboutPageState extends State<AboutPage> {
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              Icons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
@@ -469,8 +457,7 @@ class _AboutPageState extends State<AboutPage> {
                                                 Uri.parse(
                                                   'https://t.me/blackhole_official',
                                                 ),
-                                                mode: LaunchMode
-                                                    .externalApplication,
+                                                mode: LaunchMode.externalApplication,
                                               );
                                             },
                                           ),

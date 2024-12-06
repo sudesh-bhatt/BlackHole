@@ -34,7 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DownloadedSongs extends StatefulWidget {
@@ -53,8 +53,7 @@ class DownloadedSongs extends StatefulWidget {
   _DownloadedSongsState createState() => _DownloadedSongsState();
 }
 
-class _DownloadedSongsState extends State<DownloadedSongs>
-    with TickerProviderStateMixin {
+class _DownloadedSongsState extends State<DownloadedSongs> with TickerProviderStateMixin {
   List<SongModel> _songs = [];
   String? tempPath = Hive.box('settings').get('tempDirPath')?.toString();
   final Map<String, List<SongModel>> _albums = {};
@@ -70,18 +69,13 @@ class _DownloadedSongsState extends State<DownloadedSongs>
 
   bool added = false;
   int sortValue = Hive.box('settings').get('sortValue', defaultValue: 1) as int;
-  int orderValue =
-      Hive.box('settings').get('orderValue', defaultValue: 1) as int;
-  int albumSortValue =
-      Hive.box('settings').get('albumSortValue', defaultValue: 2) as int;
-  List dirPaths =
-      Hive.box('settings').get('searchPaths', defaultValue: []) as List;
-  int minDuration =
-      Hive.box('settings').get('minDuration', defaultValue: 10) as int;
-  bool includeOrExclude =
-      Hive.box('settings').get('includeOrExclude', defaultValue: false) as bool;
-  List includedExcludedPaths = Hive.box('settings')
-      .get('includedExcludedPaths', defaultValue: []) as List;
+  int orderValue = Hive.box('settings').get('orderValue', defaultValue: 1) as int;
+  int albumSortValue = Hive.box('settings').get('albumSortValue', defaultValue: 2) as int;
+  List dirPaths = Hive.box('settings').get('searchPaths', defaultValue: []) as List;
+  int minDuration = Hive.box('settings').get('minDuration', defaultValue: 10) as int;
+  bool includeOrExclude = Hive.box('settings').get('includeOrExclude', defaultValue: false) as bool;
+  List includedExcludedPaths =
+      Hive.box('settings').get('includedExcludedPaths', defaultValue: []) as List;
   TabController? _tcontroller;
   int _currentTabIndex = 0;
   OfflineAudioQuery offlineAudioQuery = OfflineAudioQuery();
@@ -103,8 +97,7 @@ class _DownloadedSongsState extends State<DownloadedSongs>
 
   @override
   void initState() {
-    _tcontroller =
-        TabController(length: widget.showPlaylists ? 6 : 5, vsync: this);
+    _tcontroller = TabController(length: widget.showPlaylists ? 6 : 5, vsync: this);
     _tcontroller!.addListener(() {
       if ((_tcontroller!.previousIndex != 0 && _tcontroller!.index == 0) ||
           (_tcontroller!.previousIndex == 0)) {
@@ -148,12 +141,8 @@ class _DownloadedSongsState extends State<DownloadedSongs>
             .where(
               (i) =>
                   (i.duration ?? 60000) > 1000 * minDuration &&
-                  ((i.isMusic ?? true) ||
-                      (i.isPodcast ?? false) ||
-                      (i.isAudioBook ?? false)) &&
-                  (includeOrExclude
-                      ? checkIncludedOrExcluded(i)
-                      : !checkIncludedOrExcluded(i)),
+                  ((i.isMusic ?? true) || (i.isPodcast ?? false) || (i.isAudioBook ?? false)) &&
+                  (includeOrExclude ? checkIncludedOrExcluded(i) : !checkIncludedOrExcluded(i)),
             )
             .toList();
       } else {
@@ -382,8 +371,7 @@ class _DownloadedSongsState extends State<DownloadedSongs>
                                   if (sortValue == sortTypes.indexOf(e))
                                     Icon(
                                       Icons.check_rounded,
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
+                                      color: Theme.of(context).brightness == Brightness.dark
                                           ? Colors.white
                                           : Colors.grey[700],
                                     )
@@ -414,8 +402,7 @@ class _DownloadedSongsState extends State<DownloadedSongs>
                                   if (orderValue == orderTypes.indexOf(e))
                                     Icon(
                                       Icons.check_rounded,
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
+                                      color: Theme.of(context).brightness == Brightness.dark
                                           ? Colors.white
                                           : Colors.grey[700],
                                     )
@@ -744,8 +731,7 @@ class SongsTab extends StatefulWidget {
   State<SongsTab> createState() => _SongsTabState();
 }
 
-class _SongsTabState extends State<SongsTab>
-    with AutomaticKeepAliveClientMixin {
+class _SongsTabState extends State<SongsTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -813,8 +799,7 @@ class _SongsTabState extends State<SongsTab>
                         trailing: PopupMenuButton(
                           icon: const Icon(Icons.more_vert_rounded),
                           shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15.0)),
+                            borderRadius: BorderRadius.all(Radius.circular(15.0)),
                           ),
                           onSelected: (int? value) async {
                             if (value == 0) {
@@ -1334,8 +1319,7 @@ class AlbumsTab extends StatefulWidget {
   State<AlbumsTab> createState() => _AlbumsTabState();
 }
 
-class _AlbumsTabState extends State<AlbumsTab>
-    with AutomaticKeepAliveClientMixin {
+class _AlbumsTabState extends State<AlbumsTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -1385,8 +1369,7 @@ class _AlbumsTabState extends State<AlbumsTab>
                     id: widget.albums[widget.albumsList[index]]![0].id,
                     type: ArtworkType.AUDIO,
                     tempPath: widget.tempPath,
-                    fileName: widget
-                        .albums[widget.albumsList[index]]![0].displayNameWOExt,
+                    fileName: widget.albums[widget.albumsList[index]]![0].displayNameWOExt,
                   ),
                   title: Text(
                     title,

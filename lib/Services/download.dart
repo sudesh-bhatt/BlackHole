@@ -56,21 +56,19 @@ class Download with ChangeNotifier {
 
   int? rememberOption;
   final ValueNotifier<bool> remember = ValueNotifier<bool>(false);
-  String preferredDownloadQuality = Hive.box('settings')
-      .get('downloadQuality', defaultValue: '320 kbps') as String;
-  String preferredYtDownloadQuality = Hive.box('settings')
-      .get('ytDownloadQuality', defaultValue: 'High') as String;
-  String downloadFormat = Hive.box('settings')
-      .get('downloadFormat', defaultValue: 'm4a')
-      .toString();
-  bool createDownloadFolder = Hive.box('settings')
-      .get('createDownloadFolder', defaultValue: false) as bool;
-  bool createYoutubeFolder = Hive.box('settings')
-      .get('createYoutubeFolder', defaultValue: false) as bool;
+  String preferredDownloadQuality =
+      Hive.box('settings').get('downloadQuality', defaultValue: '320 kbps') as String;
+  String preferredYtDownloadQuality =
+      Hive.box('settings').get('ytDownloadQuality', defaultValue: 'High') as String;
+  String downloadFormat =
+      Hive.box('settings').get('downloadFormat', defaultValue: 'm4a').toString();
+  bool createDownloadFolder =
+      Hive.box('settings').get('createDownloadFolder', defaultValue: false) as bool;
+  bool createYoutubeFolder =
+      Hive.box('settings').get('createYoutubeFolder', defaultValue: false) as bool;
   double? progress = 0.0;
   String lastDownloadId = '';
-  bool downloadLyrics =
-      Hive.box('settings').get('downloadLyrics', defaultValue: false) as bool;
+  bool downloadLyrics = Hive.box('settings').get('downloadLyrics', defaultValue: false) as bool;
   bool download = true;
 
   Future<void> prepareDownload(
@@ -102,8 +100,7 @@ class Download with ChangeNotifier {
     data['title'] = data['title'].toString().split('(From')[0].trim();
 
     String filename = '';
-    final int downFilename =
-        Hive.box('settings').get('downFilename', defaultValue: 0) as int;
+    final int downFilename = Hive.box('settings').get('downFilename', defaultValue: 0) as int;
     if (downFilename == 0) {
       filename = '${data["title"]} - ${data["artist"]}';
     } else if (downFilename == 1) {
@@ -112,8 +109,7 @@ class Download with ChangeNotifier {
       filename = '${data["title"]}';
     }
     // String filename = '${data["title"]} - ${data["artist"]}';
-    String dlPath =
-        Hive.box('settings').get('downloadPath', defaultValue: '') as String;
+    String dlPath = Hive.box('settings').get('downloadPath', defaultValue: '') as String;
     Logger.root.info('Cached Download path: $dlPath');
     if (filename.length > 200) {
       final String temp = filename.substring(0, 200);
@@ -177,8 +173,7 @@ class Download with ChangeNotifier {
               ),
               title: Text(
                 AppLocalizations.of(context)!.alreadyExists,
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
+                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -207,8 +202,7 @@ class Download with ChangeNotifier {
                           child: Row(
                             children: [
                               Checkbox(
-                                activeColor:
-                                    Theme.of(context).colorScheme.secondary,
+                                activeColor: Theme.of(context).colorScheme.secondary,
                                 value: rememberValue,
                                 onChanged: (bool? value) {
                                   remember.value = value ?? false;
@@ -229,8 +223,7 @@ class Download with ChangeNotifier {
                         children: [
                           TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: Theme.of(context).brightness ==
-                                      Brightness.dark
+                              foregroundColor: Theme.of(context).brightness == Brightness.dark
                                   ? Colors.white
                                   : Colors.grey[700],
                             ),
@@ -246,8 +239,7 @@ class Download with ChangeNotifier {
                           ),
                           TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: Theme.of(context).brightness ==
-                                      Brightness.dark
+                              foregroundColor: Theme.of(context).brightness == Brightness.dark
                                   ? Colors.white
                                   : Colors.grey[700],
                             ),
@@ -257,21 +249,18 @@ class Download with ChangeNotifier {
                               downloadSong(context, dlPath, filename, data);
                               rememberOption = 1;
                             },
-                            child:
-                                Text(AppLocalizations.of(context)!.yesReplace),
+                            child: Text(AppLocalizations.of(context)!.yesReplace),
                           ),
                           const SizedBox(width: 5.0),
                           TextButton(
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
                             ),
                             onPressed: () async {
                               Navigator.pop(context);
                               while (await File('$dlPath/$filename').exists()) {
-                                filename =
-                                    filename.replaceAll('.m4a', ' (1).m4a');
+                                filename = filename.replaceAll('.m4a', ' (1).m4a');
                               }
                               rememberOption = 2;
                               downloadSong(context, dlPath, filename, data);
@@ -279,11 +268,9 @@ class Download with ChangeNotifier {
                             child: Text(
                               AppLocalizations.of(context)!.yes,
                               style: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.secondary ==
-                                            Colors.white
-                                        ? Colors.black
-                                        : null,
+                                color: Theme.of(context).colorScheme.secondary == Colors.white
+                                    ? Colors.black
+                                    : null,
                               ),
                             ),
                           ),
@@ -337,8 +324,7 @@ class Download with ChangeNotifier {
           .create(recursive: true)
           .then((value) => filepath2 = value.path);
     } catch (e) {
-      Logger.root
-          .info('Error creating files, requesting additional permission');
+      Logger.root.info('Error creating files, requesting additional permission');
       if (Platform.isAndroid) {
         PermissionStatus status = await Permission.manageExternalStorage.status;
         if (status.isDenied) {
@@ -386,8 +372,7 @@ class Download with ChangeNotifier {
     if (data['url'].toString().contains('google')) {
       // Use preferredYtDownloadQuality to check for quality first
       final AudioOnlyStreamInfo streamInfo =
-          (await YouTubeServices.instance.getStreamInfo(data['id'].toString()))
-              .last;
+          (await YouTubeServices.instance.getStreamInfo(data['id'].toString())).last;
       total = streamInfo.size.totalBytes;
       // Get the actual stream
       stream = YouTubeServices.instance.getStreamClient(streamInfo);
@@ -419,8 +404,7 @@ class Download with ChangeNotifier {
         await file.writeAsBytes(bytes);
 
         final client = HttpClient();
-        final HttpClientRequest request2 =
-            await client.getUrl(Uri.parse(data['image'].toString()));
+        final HttpClientRequest request2 = await client.getUrl(Uri.parse(data['image'].toString()));
         final HttpClientResponse response2 = await request2.close();
         final bytes2 = await consolidateHttpClientResponseBytes(response2);
         final File file2 = File(filepath2);
@@ -537,7 +521,7 @@ class Download with ChangeNotifier {
                 // discNumber: 1,
                 // discTotal: 5,
                 durationMs: int.parse(data['duration'].toString()) * 1000,
-                fileSize: file.lengthSync(),
+                fileSize: BigInt.from(file.lengthSync()),
                 picture: Picture(
                   data: bytes2,
                   mimeType: 'image/jpeg',
@@ -558,8 +542,8 @@ class Download with ChangeNotifier {
           'title': data['title'].toString(),
           'subtitle': data['subtitle'].toString(),
           'artist': data['artist'].toString(),
-          'albumArtist': data['album_artist']?.toString() ??
-              data['artist']?.toString().split(', ')[0],
+          'albumArtist':
+              data['album_artist']?.toString() ?? data['artist']?.toString().split(', ')[0],
           'album': data['album'].toString(),
           'genre': data['language'].toString(),
           'year': data['year'].toString(),

@@ -27,7 +27,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logging/logging.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query_forked/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -49,8 +49,7 @@ class PlayerInvoke {
     final List finalList = songsList.toList();
     if (shuffle) finalList.shuffle();
     if (offline == null) {
-      if (audioHandler.mediaItem.value?.extras!['url'].startsWith('http')
-          as bool) {
+      if (audioHandler.mediaItem.value?.extras!['url'].startsWith('http') as bool) {
         offline = false;
       } else {
         offline = true;
@@ -84,13 +83,9 @@ class PlayerInvoke {
     Directory tempDir,
   ) async {
     String playTitle = response.title;
-    playTitle == ''
-        ? playTitle = response.displayNameWOExt
-        : playTitle = response.title;
+    playTitle == '' ? playTitle = response.displayNameWOExt : playTitle = response.title;
     String playArtist = response.artist!;
-    playArtist == '<unknown>'
-        ? playArtist = 'Unknown'
-        : playArtist = response.artist!;
+    playArtist == '<unknown>' ? playArtist = 'Unknown' : playArtist = response.artist!;
 
     final String playAlbum = response.album!;
     final int playDuration = response.duration ?? 180000;
@@ -121,8 +116,7 @@ class PlayerInvoke {
       if (!await file.exists()) {
         final byteData = await rootBundle.load('assets/cover.jpg');
         await file.writeAsBytes(
-          byteData.buffer
-              .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
+          byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
         );
       }
       final List<MediaItem> queue = [];
@@ -160,8 +154,7 @@ class PlayerInvoke {
       if (!await file.exists()) {
         final byteData = await rootBundle.load('assets/cover.jpg');
         await file.writeAsBytes(
-          byteData.buffer
-              .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
+          byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
         );
       }
       final List<MediaItem> queue = [];
@@ -203,13 +196,10 @@ class PlayerInvoke {
             }
           }
 
-          if ((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 350 >
-              minExpiredAt) {
+          if ((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 350 > minExpiredAt) {
             // cache expired
-            Logger.root
-                .info('youtube link expired in cache for ${playItem["title"]}');
-            final newData = await YouTubeServices.instance
-                .refreshLink(playItem['id'].toString());
+            Logger.root.info('youtube link expired in cache for ${playItem["title"]}');
+            final newData = await YouTubeServices.instance.refreshLink(playItem['id'].toString());
             Logger.root.info(
               'before service | received new link for ${playItem["title"]}',
             );
@@ -220,14 +210,12 @@ class PlayerInvoke {
             }
           } else {
             // giving cache link
-            Logger.root
-                .info('youtube link found in cache for ${playItem["title"]}');
+            Logger.root.info('youtube link found in cache for ${playItem["title"]}');
             playItem['url'] = cache.last['url'];
             playItem['expire_at'] = cache.last['expireAt'];
           }
         } else {
-          final newData = await YouTubeServices.instance
-              .refreshLink(playItem['id'].toString());
+          final newData = await YouTubeServices.instance.refreshLink(playItem['id'].toString());
           Logger.root.info(
             'before service | received new link for ${playItem["title"]}',
           );
@@ -238,8 +226,7 @@ class PlayerInvoke {
           }
         }
       } else {
-        final newData = await YouTubeServices.instance
-            .refreshLink(playItem['id'].toString());
+        final newData = await YouTubeServices.instance.refreshLink(playItem['id'].toString());
         Logger.root.info(
           'before service | received new link for ${playItem["title"]}',
         );
@@ -260,8 +247,7 @@ class PlayerInvoke {
   }) async {
     final List<MediaItem> queue = [];
     final Map playItem = response[index] as Map;
-    final Map? nextItem =
-        index == response.length - 1 ? null : response[index + 1] as Map;
+    final Map? nextItem = index == response.length - 1 ? null : response[index + 1] as Map;
     if (playItem['genre'] == 'YouTube') {
       await refreshYtLink(playItem);
     }
